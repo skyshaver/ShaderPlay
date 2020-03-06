@@ -123,9 +123,8 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	Shader simpleShader("shaders/simple_shader.vert", "shaders/color_shader_01.frag");
+	Shader simpleShader("shaders/simple_shader.vert", "shaders/drawing_shader_00.frag");
 
-	
 	// variables for passing to uniforms
 	double mouseXpos, mouseYpos;
 	int currentWw, currentWh;
@@ -148,7 +147,7 @@ int main()
 		//std::cout << std::abs(sin(u_time)) << '\n';
 		simpleShader.setFloat("u_time", u_time);
 
-		//
+		// screen position uniform
 		glfwGetWindowSize(window, &currentWw, &currentWh);
 		glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
 		simpleShader.setVec2("u_resolution", u_resolution);

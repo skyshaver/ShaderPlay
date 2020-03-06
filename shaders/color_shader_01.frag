@@ -34,7 +34,7 @@ void main(){
     // Map the angle (-PI to PI) to the Hue (from 0 to 1)
     // and the Saturation to the radius
     // adding time to the angle makes it spin
-    color = hsb2rgb(vec3(((angle / TWO_PI) + 0.5)  + (u_time * 0.1), radius, 1.0));
+    color = hsb2rgb(vec3(((angle / TWO_PI) + 0.5) + (u_time * 0.1), radius, 1));
 
     FragColor = vec4(color, 1.0);
 }
