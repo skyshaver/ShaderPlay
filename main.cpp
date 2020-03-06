@@ -26,12 +26,36 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 {
 
 }
-
+// store previous window size
+int wXPos, wYPos, wW, wH;
+static bool fullscreen = false;
 // temp setup glfw keycallback to use esc for exit
 void processInput(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+	// esc to exit
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(window, true); }
+
+	// toggle full screen
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !fullscreen)
+	{
+		// capture state of window
+		glfwGetWindowPos(window, &wXPos, &wYPos);
+		glfwGetWindowSize(window, &wW, &wH);
+		// switch to exclusive fullscreen
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, 0);
+		fullscreen = true;
+	}
+			
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && fullscreen)
+	{
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		// switch back to previous window state
+		glfwSetWindowMonitor(window, nullptr, wXPos, wYPos, wW, wH, 0);
+		fullscreen = false;
+	}
+
 }
 
 int main()
@@ -101,9 +125,10 @@ int main()
 
 	Shader simpleShader("shaders/simple_shader.vert", "shaders/color_shader_01.frag");
 
-	glm::vec2 u_resolution = { float(WWIDTH), float(WHEIGHT) };
-
+	
+	// variables for passing to uniforms
 	double mouseXpos, mouseYpos;
+	int currentWw, currentWh;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -115,7 +140,7 @@ int main()
 
 		// shader and uniforms
 		simpleShader.use();
-		simpleShader.setVec2("u_resolution", u_resolution);
+		
 
 		// pass elapsed time uniform
 		static float startTime = glfwGetTime();
@@ -123,6 +148,10 @@ int main()
 		//std::cout << std::abs(sin(u_time)) << '\n';
 		simpleShader.setFloat("u_time", u_time);
 
+		//
+		glfwGetWindowSize(window, &currentWw, &currentWh);
+		glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
+		simpleShader.setVec2("u_resolution", u_resolution);
 		// pass mouse position uniform
 		glfwGetCursorPos(window, &mouseXpos, &mouseYpos);
 		glm::vec2 u_mousePos = { mouseXpos, mouseYpos };
