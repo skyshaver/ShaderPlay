@@ -123,7 +123,7 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	Shader simpleShader("shaders/simple_shader.vert", "shaders/drawing_shader_00.frag");
+	Shader simpleShader("shaders/simple_shader.vert", "shaders/drawing_shader_01.frag");
 
 	// variables for passing to uniforms
 	double mouseXpos, mouseYpos;
@@ -140,7 +140,6 @@ int main()
 		// shader and uniforms
 		simpleShader.use();
 		
-
 		// pass elapsed time uniform
 		static float startTime = glfwGetTime();
 		float u_time = glfwGetTime() - startTime;
@@ -151,6 +150,7 @@ int main()
 		glfwGetWindowSize(window, &currentWw, &currentWh);
 		glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
 		simpleShader.setVec2("u_resolution", u_resolution);
+
 		// pass mouse position uniform
 		glfwGetCursorPos(window, &mouseXpos, &mouseYpos);
 		glm::vec2 u_mousePos = { mouseXpos, mouseYpos };
@@ -158,7 +158,6 @@ int main()
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-
 
 		//---------------------------
 		glfwSwapBuffers(window);
