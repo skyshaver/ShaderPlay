@@ -1,3 +1,5 @@
+// draw a couple of rectangles
+
 #version 330 core
 
 out vec4 FragColor;

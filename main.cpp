@@ -22,8 +22,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+// variables to hide mouse when program is first launched
+double prevXpos = 0.0;
+double prevYpos = 0.0;
+bool firstMouseMove = true;
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	if (firstMouseMove)
+	{
+		prevXpos = xpos;
+		prevYpos = ypos;
+		firstMouseMove = false;
+	}
+	
+	if (prevXpos != xpos || prevYpos != ypos)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
 
 }
 // store previous window size
@@ -70,7 +85,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WWIDTH, WHEIGHT, "hello", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WWIDTH, WHEIGHT, "Shader Play", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -124,6 +139,9 @@ int main()
 	glEnableVertexAttribArray(2);
 
 	Shader simpleShader("shaders/simple_shader.vert", "shaders/drawing_shader_02.frag");
+
+	// hide mouse cursor on load
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	// variables for passing to uniforms
 	double mouseXpos, mouseYpos;
