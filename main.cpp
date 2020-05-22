@@ -8,6 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "julia_data.h"
+using namespace julia;
 
 #include <iostream>
 
@@ -138,7 +140,11 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
+	// this is the super cool one
 	Shader simpleShader("shaders/simple_shader.vert", "shaders/drawing_shader_02.frag");
+
+	// julia shader
+	Shader juliaShader("shaders/simple_shader.vert", "shaders/julia.frag");
 
 	// hide mouse cursor on load
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -156,23 +162,46 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// shader and uniforms
-		simpleShader.use();
-		
-		// pass elapsed time uniform
+		// simpleShader.use();
+
+		// julia
+		juliaShader.use();
+
+		// time
 		static float startTime = glfwGetTime();
 		float u_time = glfwGetTime() - startTime;
-		//std::cout << std::abs(sin(u_time)) << '\n';
-		simpleShader.setFloat("u_time", u_time);
 
-		// screen position uniform
-		glfwGetWindowSize(window, &currentWw, &currentWh);
-		glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
-		simpleShader.setVec2("u_resolution", u_resolution);
+		// animation
+		bias[0] = center[0] + amplitude[0] * sin(.05f * PI * (u_time + phase[0]));
+		bias[1] = center[1] + amplitude[1] * sin(.05f * PI * (u_time + phase[1]));
 
-		// pass mouse position uniform
-		glfwGetCursorPos(window, &mouseXpos, &mouseYpos);
-		glm::vec2 u_mousePos = { mouseXpos, mouseYpos };
-		simpleShader.setVec2("u_mousePos", u_mousePos);
+
+		// julia uniforms
+		juliaShader.setInt("maxiter", res);
+		juliaShader.setFloat("radius", radius);
+		juliaShader.setFloat("zoom", zoom);
+		juliaShader.setInt("order", order);
+		juliaShader.setVec4("converge", glm::vec4(cc[0], cc[1], cc[2], cc[3]));
+		juliaShader.setVec4("diverge", glm::vec4(dc[0], dc[1], dc[2], dc[3]));
+		juliaShader.setVec2("bias", glm::vec2(bias[0], bias[1]));
+		juliaShader.setVec2("offset", glm::vec2(px, py));
+		
+		
+		//// pass elapsed time uniform
+		//static float startTime = glfwGetTime();
+		//float u_time = glfwGetTime() - startTime;
+		////std::cout << std::abs(sin(u_time)) << '\n';
+		//simpleShader.setFloat("u_time", u_time);
+
+		//// screen position uniform
+		//glfwGetWindowSize(window, &currentWw, &currentWh);
+		//glm::vec2 u_resolution = { float(currentWw), float(currentWh) };
+		//simpleShader.setVec2("u_resolution", u_resolution);
+
+		//// pass mouse position uniform
+		//glfwGetCursorPos(window, &mouseXpos, &mouseYpos);
+		//glm::vec2 u_mousePos = { mouseXpos, mouseYpos };
+		//simpleShader.setVec2("u_mousePos", u_mousePos);
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
